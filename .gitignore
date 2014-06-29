@@ -2,5 +2,5 @@ bin/
 vendor/
 .idea/
 db_settings.json
-config/*.json
-!config/*.json.example
+config/slim/*.json
+.htaccess
