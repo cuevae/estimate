@@ -103,6 +103,9 @@ class Data implements \Iterator
         reset( $this->objects );
     }
 
+    /**
+     * @return array
+     */
     public function _output()
     {
         $objects = $this->objects ? : array();

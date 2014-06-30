@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: manei
- * Date: 27/06/14
- * Time: 19:32
- */
 
 namespace CollectionPlusJson;
 
