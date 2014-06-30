@@ -2,10 +2,9 @@
 <phpunit
         colors="true"
         bootstrap="vendor/autoload.php">
-
     <testsuites>
-        <testsuite name="App tests">
-            <directory>tests/unit</directory>
+        <testsuite name="CollectionPlusJson Tests">
+            <directory>lib/collectionPlusJson/tests/</directory>
         </testsuite>
     </testsuites>
 </phpunit>
