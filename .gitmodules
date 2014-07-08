@@ -1,0 +1,3 @@
+[submodule "lib/collectionPlusJson"]
+	path = lib/collectionPlusJson
+	url = git@github.com:cuevaec/collectionPlusJson-php.git
