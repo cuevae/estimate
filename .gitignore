@@ -2,5 +2,5 @@ bin/
 vendor/
 .idea/
 db_settings.json
-config/slim/*.json
+app-config.json
 .htaccess
