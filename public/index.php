@@ -3,7 +3,6 @@
 require '../vendor/autoload.php';
 
 use \CollectionPlusJson\Collection;
-use \CollectionPlusJson\Item;
 use \CollectionPlusJson\Util\Href;
 use \CollectionPlusJson\Util\Parser\Item as ItemParser;
 use \Estimate\App as Estimate;
@@ -15,21 +14,12 @@ $configLoader = json_decode(file_get_contents(SLIM_CONFIG_PATH), true);
 $appConfig    = $configLoader[ENVIRONMENT];
 
 $app = new \Slim\Slim($appConfig);
-
-$app->get(
-    '/project/:projectId',
-        function ($projectId) use ($app)
-        {
-            echo "This is project " . $projectId . PHP_EOL;
-        }
-);
+$baseUrl = new Href('http://api.estimate.io/');
 
 $app->get(
     '/',
-        function () use ($app)
+        function () use ($app, $baseUrl)
         {
-
-            $baseUrl = new Href('http://api.estimate.io/');
             $collection = new Collection( $baseUrl );
             $estimate = new Estimate();
 
@@ -52,18 +42,18 @@ $app->get(
                 $collection->addItems($itemParser->parseManyFromArray($projects));
             }
 
-            /**
-             * RESPONSE HEADERS
-             */
             $app->response->headers->set('Content-Type', 'application/vnd.collection+json');
-
-            /**
-             * RESPONSE STATUS
-             */
             $app->response->status(200);
 
             echo json_encode($collection->output());
+        }
+);
 
+$app->get(
+    '/project/:projectId',
+        function ($projectId) use ($app)
+        {
+            echo "This is project " . $projectId . PHP_EOL;
         }
 );
 
