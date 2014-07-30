@@ -29,30 +29,28 @@ $app->get(
         function () use ($app)
         {
 
+            $baseUrl = new Href('http://api.estimate.io/');
+            $collection = new Collection( $baseUrl );
             $estimate = new Estimate();
 
             $projects = $estimate->getProjects();
-
-            $collection = new Collection(new Href('http://api.estimate.io/'));
+            $projects = array_reduce( $projects, function($result, $item) use( $baseUrl ){
+                $temp = array('href' => $baseUrl->extend('project/' . $item['id'])->getUrl(),
+                              'data' => array( array( 'id', $item['id'], 'Project id.' ),
+                                               array( 'name', $item['name'], 'Project name.' ),
+                                               array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
+                                               array( 'due_date_hr', date('Y-m-d H:i:s', $item['due_date']),
+                                                      'Project due date human readable "YYYY-MM-DD HH:MM:SS".' )
+                              ));
+                $result[] = $temp;
+                return $result;
+            }, array());
 
             if (isset($projects) && is_array($projects) && !empty($projects))
             {
                 $itemParser = new ItemParser();
                 $collection->addItems($itemParser->parseManyFromArray($projects));
             }
-
-            /*$color1 = new Item($collection->getHref()->extend('colors/color1'));
-            $color1->addData('id', '1', 'This is the color id')
-                   ->addData('hex_value', '#9932CC', 'This is the color in hex format')
-                   ->addData('human_value', 'DarkOrchid', 'This is the color in human readable format');
-
-            $color2 = new Item($collection->getHref()->extend('colors/color2'));
-            $color2->addData('id', '2', 'This is the color id')
-                   ->addData('hex_value', '#FFFFF0', 'This is the color in hex format')
-                   ->addData('human_value', 'Ivory', 'This is the color in human readable format');
-
-
-            $collection->addItem($color1)->addItem($color2);*/
 
             /**
              * RESPONSE HEADERS
