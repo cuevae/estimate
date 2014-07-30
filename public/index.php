@@ -13,19 +13,21 @@ const SLIM_CONFIG_PATH = '../config/slim/app-config.json';
 $configLoader = json_decode(file_get_contents(SLIM_CONFIG_PATH), true);
 $appConfig    = $configLoader[ENVIRONMENT];
 
+/** @var \Slim\Slim $app */
 $app = new \Slim\Slim($appConfig);
-$baseUrl = new Href('http://api.estimate.io/');
 
 $app->get(
     '/',
-        function () use ($app, $baseUrl)
+        function () use ($app)
         {
-            $collection = new Collection( $baseUrl );
+            $url = new Href( $app->request()->getUrl() );
+
+            $collection = new Collection( $url );
             $estimate = new Estimate();
 
             $projects = $estimate->getProjects();
-            $projects = array_reduce( $projects, function($result, $item) use( $baseUrl ){
-                $temp = array('href' => $baseUrl->extend('project/' . $item['id'])->getUrl(),
+            $projects = array_reduce( $projects, function($result, $item) use( $url ){
+                $temp = array('href' => $url->extend('/project/' . $item['id'])->getUrl(),
                               'data' => array( array( 'id', $item['id'], 'Project id.' ),
                                                array( 'name', $item['name'], 'Project name.' ),
                                                array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
