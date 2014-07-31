@@ -2,16 +2,40 @@
 
 namespace Estimate;
 
+use \Estimate\Project;
+
 class App
 {
 
+    protected $persistenceHandler;
+
+    public function __construct(PersintenceHandler $persintenceHandler = null)
+    {
+
+    }
+
     public function getProjects()
     {
-        return array(
-            array( 'id' => 'abc123', 'hash' => '', 'name' => 'Test project 1', 'due_date' => '1608897600' ),
-            array( 'id' => '2sdf31', 'hash' => '', 'name' => 'Test project 2', 'due_date' => '1608984000' ),
-            array( 'id' => '3sd2xc', 'hash' => '', 'name' => 'Test project 3', 'due_date' => '1609070400' ),
-        );
+        $projects = array();
+        if(isset($this->persistenceHandler)){
+            $projects = $this->persistenceHandler->load('\Estimate\Project');
+        }
+
+        return $projects;
+    }
+
+    public function addProject($name, $dueDate)
+    {
+        try{
+            $project = new Project($name, $dueDate);
+        } catch( \Exception $e ){
+            throw new \Exception('Project could not be added: ' . $e->getMessage() );
+        }
+
+        if(isset($this->persistenceHandler)){
+            $this->persistenceHandler->save($project);
+        }
+
     }
 
 } 
