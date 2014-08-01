@@ -21,22 +21,25 @@ $app->get(
     '/',
         function () use ($app)
         {
-            $url = new Href( $app->request()->getUrl() );
+            $url = new Href($app->request()->getUrl());
 
-            $collection = new Collection( $url );
-            $estimate = new Estimate( new JsonPersistence('../persistence-test-folder/json') );
+            $collection = new Collection($url);
+            $estimate   = new Estimate(new JsonPersistence('../persistence-test-folder/json'));
 
             $projects = $estimate->getProjects();
-            if(!empty($projects)){
-                $projects = array_reduce( $projects, function($result, $item) use( $url ){
-                    $temp = array('href' => $url->extend('/project/' . $item['id'])->getUrl(),
-                                  'data' => array( array( 'id', $item['id'], 'Project id.' ),
-                                                   array( 'name', $item['name'], 'Project name.' ),
-                                                   array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
-                                                   array( 'due_date_hr', date('Y-m-d H:i:s', $item['due_date']),
-                                                          'Project due date human readable "YYYY-MM-DD HH:MM:SS".' )
-                                  ));
+            if (is_array($projects) && !empty($projects) )
+            {
+                $projects = array_reduce($projects, function ($result, $item) use ($url)
+                {
+                    $temp     = array( 'href' => $url->extend('/project/' . $item['id'])->getUrl(),
+                                       'data' => array( array( 'id', $item['id'], 'Project id.' ),
+                                                        array( 'name', $item['name'], 'Project name.' ),
+                                                        array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
+                                                        array( 'due_date_hr', date('Y-m-d H:i:s', $item['due_date']),
+                                                               'Project due date human readable "YYYY-MM-DD HH:MM:SS".' )
+                                       ) );
                     $result[] = $temp;
+
                     return $result;
                 }, array());
             }
@@ -51,6 +54,14 @@ $app->get(
             $app->response->status(200);
 
             echo json_encode($collection->output());
+        }
+);
+
+$app->put(
+    '/projects/',
+        function () use ($app)
+        {
+            echo json_encode($app->request());
         }
 );
 
