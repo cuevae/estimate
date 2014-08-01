@@ -6,6 +6,7 @@ use \CollectionPlusJson\Collection;
 use \CollectionPlusJson\Util\Href;
 use \CollectionPlusJson\Util\Parser\Item as ItemParser;
 use \Estimate\App as Estimate;
+use \Estimate\Persistence\Implementation\Json as JsonPersistence;
 
 const ENVIRONMENT      = 'development';
 const SLIM_CONFIG_PATH = '../config/slim/app-config.json';
@@ -23,20 +24,22 @@ $app->get(
             $url = new Href( $app->request()->getUrl() );
 
             $collection = new Collection( $url );
-            $estimate = new Estimate();
+            $estimate = new Estimate( new JsonPersistence('../persistence-test-folder/json') );
 
             $projects = $estimate->getProjects();
-            $projects = array_reduce( $projects, function($result, $item) use( $url ){
-                $temp = array('href' => $url->extend('/project/' . $item['id'])->getUrl(),
-                              'data' => array( array( 'id', $item['id'], 'Project id.' ),
-                                               array( 'name', $item['name'], 'Project name.' ),
-                                               array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
-                                               array( 'due_date_hr', date('Y-m-d H:i:s', $item['due_date']),
-                                                      'Project due date human readable "YYYY-MM-DD HH:MM:SS".' )
-                              ));
-                $result[] = $temp;
-                return $result;
-            }, array());
+            if(!empty($projects)){
+                $projects = array_reduce( $projects, function($result, $item) use( $url ){
+                    $temp = array('href' => $url->extend('/project/' . $item['id'])->getUrl(),
+                                  'data' => array( array( 'id', $item['id'], 'Project id.' ),
+                                                   array( 'name', $item['name'], 'Project name.' ),
+                                                   array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
+                                                   array( 'due_date_hr', date('Y-m-d H:i:s', $item['due_date']),
+                                                          'Project due date human readable "YYYY-MM-DD HH:MM:SS".' )
+                                  ));
+                    $result[] = $temp;
+                    return $result;
+                }, array());
+            }
 
             if (isset($projects) && is_array($projects) && !empty($projects))
             {

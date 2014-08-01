@@ -2,7 +2,7 @@
 
 namespace Estimate;
 
-use \Estimate\Project;
+use \Estimate\Persistence\HandlerInterface as PersintenceHandler;
 
 class App
 {
@@ -11,14 +11,14 @@ class App
 
     public function __construct(PersintenceHandler $persintenceHandler = null)
     {
-
+        $this->persistenceHandler = $persintenceHandler;
     }
 
     public function getProjects()
     {
         $projects = array();
         if(isset($this->persistenceHandler)){
-            $projects = $this->persistenceHandler->load('\Estimate\Project');
+            $projects = $this->persistenceHandler->get('*');
         }
 
         return $projects;
@@ -33,7 +33,7 @@ class App
         }
 
         if(isset($this->persistenceHandler)){
-            $this->persistenceHandler->save($project);
+            $this->persistenceHandler->put($project);
         }
 
     }
