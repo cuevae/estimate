@@ -61,7 +61,20 @@ $app->put(
     '/projects/',
         function () use ($app)
         {
-            echo json_encode($app->request());
+            $name = $app->request->put('name');
+            $dueDate = $app->request->put('due_date');
+
+            $estimate   = new Estimate(new JsonPersistence('../persistence-test-folder/json'));
+
+            try{
+                $estimate->addProject($name, $dueDate);
+                $app->response->status(201);
+            } catch( \Exception $e ){
+                $app->response->status(400);
+                echo($e->getMessage());
+            }
+
+            echo json_encode($app->request->getBody());
         }
 );
 

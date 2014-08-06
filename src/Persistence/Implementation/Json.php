@@ -46,7 +46,7 @@ class Json implements PersistenceHandler
     public function put(PersistentObject $object)
     {
         $fd = fopen($this->defaultFilePath, 'a');
-        fwrite($fd, json_encode($object));
+        fwrite($fd, json_encode($object->getPersistentVersion()));
         fclose($fd);
     }
 

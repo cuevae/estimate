@@ -4,7 +4,9 @@
 namespace Estimate;
 
 
-class Project
+use Estimate\Persistence\PersistentObject;
+
+class Project extends PersistentObject
 {
 
     protected $name;
@@ -16,4 +18,16 @@ class Project
         $this->dueDate = $dueDate;
     }
 
-} 
+    public function getPersistentVersion()
+    {
+        $obj = new \StdClass();
+        $obj->name = $this->name;
+        $obj->due_date = $this->dueDate;
+
+        $time = time();
+        $obj->savedOn = $time;
+        $obj->savedOnHr = date('Y-m-d H:i:s', $time);
+
+        return $obj;
+    }
+}
