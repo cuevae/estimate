@@ -18,7 +18,7 @@ $appConfig    = $configLoader[ENVIRONMENT];
 $app = new \Slim\Slim($appConfig);
 
 $app->get(
-    '/',
+    '/projects/',
         function () use ($app)
         {
             $url = new Href($app->request()->getUrl());

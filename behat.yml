@@ -2,3 +2,7 @@ default:
     paths:
         features: '%behat.paths.base%/tests/features'
         bootstrap: '%behat.paths.base%/tests/features/bootstrap'
+    context:
+      class:  FeatureContext
+      parameters:
+        test_port: 8000
