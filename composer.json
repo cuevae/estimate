@@ -17,8 +17,7 @@
     "autoload": {
         "psr-4": {
             "Estimate\\" : "src/",
-            "CollectionPlusJson\\" : "lib/collectionPlusJson/src/",
-            "PHPUnit\\" : "vendor/phpunit/phpunit/src"
+            "CollectionPlusJson\\" : "lib/collectionPlusJson/src/"
         }
     }
 }
