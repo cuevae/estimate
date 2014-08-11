@@ -7,6 +7,7 @@ use \Estimate\Persistence\HandlerInterface as PersintenceHandler;
 class App
 {
 
+    /** @var \Estimate\Persistence\HandlerInterface  */
     protected $persistenceHandler;
 
     public function __construct(PersintenceHandler $persintenceHandler = null)
