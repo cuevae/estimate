@@ -7,7 +7,6 @@ use Behat\Behat\Context\ClosuredContextInterface,
 use Behat\Gherkin\Node\PyStringNode,
     Behat\Gherkin\Node\TableNode;
 
-require_once '../../../vendor/autoload.php';
 require_once '../../../vendor/phpunit/phpunit/src/Framework/Assert/Functions.php';
 
 /**
