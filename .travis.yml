@@ -11,7 +11,7 @@ before_script:
   - git submodule update --init --recursive
   - php -S localhost:8000 -t public &
   - sleep 3
-  - mv config/app-config.json.travis config/app-config.json;
+  - mv config/slim/app-config.json.travis config/slim/app-config.json;
 script:
   - ./bin/behat --config behat.yml
   - phpunit --coverage-clover=coverage.clover --verbose
