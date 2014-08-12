@@ -1,6 +1,6 @@
 <?php
 
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use \CollectionPlusJson\Collection;
 use \CollectionPlusJson\Util\Href;
@@ -11,7 +11,7 @@ use \Estimate\Persistence\Implementation\Json as JsonPersistence;
 const ENVIRONMENT      = 'development';
 const SLIM_CONFIG_PATH = '../config/slim/app-config.json';
 
-$configLoader = json_decode(file_get_contents(SLIM_CONFIG_PATH), true);
+$configLoader = json_decode(file_get_contents(__DIR__ . '/' .SLIM_CONFIG_PATH), true);
 $appConfig    = $configLoader[ENVIRONMENT];
 
 /** @var \Slim\Slim $app */
@@ -24,7 +24,7 @@ $app->get(
             $url = new Href($app->request()->getUrl());
 
             $collection = new Collection($url);
-            $estimate   = new Estimate(new JsonPersistence('../persistence-test-folder/json'));
+            $estimate   = new Estimate(new JsonPersistence(__DIR__ . '/../persistence-test-folder/json'));
 
             $projects = $estimate->getProjects();
             if (is_array($projects) && !empty($projects) )
@@ -64,7 +64,7 @@ $app->put(
             $name = $app->request->put('name');
             $dueDate = $app->request->put('due_date');
 
-            $estimate   = new Estimate(new JsonPersistence('../persistence-test-folder/json'));
+            $estimate   = new Estimate(new JsonPersistence(__DIR__ . '/../persistence-test-folder/json'));
 
             try{
                 $estimate->addProject($name, $dueDate);
