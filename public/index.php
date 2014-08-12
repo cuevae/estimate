@@ -21,6 +21,7 @@ $app->get(
     '/projects/',
         function () use ($app)
         {
+
             $url = new Href($app->request()->getUrl());
 
             $collection = new Collection($url);
