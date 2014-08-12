@@ -16,7 +16,7 @@ class FeatureContext extends BehatContext
 {
 
     protected $endpoints = array(
-        'projects' => 'http://estimate.test/projects'
+        'projects' => 'http://estimate.dev/projects'
     );
 
     protected $endpoint = null;

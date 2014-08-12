@@ -7,8 +7,8 @@ Feature: Project management
 #    And I send a PUT request with a project name <name> and due_date <date>
 #    Then I should receive 201 response code
 #    And I should receive content type application/vnd.collection+json
-#    And header Location should contain http://estimate.test/projects/1
-#    And body should contain a link to http://estimate.test/projects/1
+#    And header Location should contain http://estimate.dev/projects/1
+#    And body should contain a link to http://estimate.dev/projects/1
 #
 #  Examples:
 #    | name | date              |
@@ -22,8 +22,8 @@ Feature: Project management
     And I send a GET request
     Then I should receive 200 response code
     And I should receive content type application/vnd.collection+json
-    #And header Location should contain http://estimate.test/projects/
-    #And body should contain a link to http://estimate.test/projects/
+    #And header Location should contain http://estimate.dev/projects/
+    #And body should contain a link to http://estimate.dev/projects/
 
 #  Scenario: Updating a project
 #    Given I know the url for a specific project with name "name" and due date "date"
