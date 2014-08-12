@@ -16,23 +16,37 @@ class FeatureContext extends BehatContext
 {
 
     protected $endpoints = array(
-        'projects' => 'http://estimate.dev/projects'
+        'projects' => '{SERVER}/projects'
     );
 
+    protected $server = null;
+    protected $port = null;
     protected $endpoint = null;
-    protected $testPort = null;
-    protected $info = null;
     protected $response = null;
+    protected $info = null;
 
     /**
      * Initializes context.
      * Every scenario gets it's own context object.
      *
      * @param array $parameters context parameters (set them up through behat.yml)
+     *
+     * @throws Exception
      */
     public function __construct(array $parameters)
     {
-        $this->testPort = $parameters['test_port'];
+        if (!isset($parameters['test_server']))
+        {
+            throw new \Exception('Please specify a test server in behat.yml file.');
+        }
+        $this->server = $parameters['test_server'];
+        $this->port = $parameters['test_port'];
+
+        //Update the endpoints with the given server name
+        array_walk($this->endpoints, function (&$item, $key)
+        {
+            $item = str_replace('{SERVER}', $this->server, $item);
+        });
     }
 
     /**
@@ -63,9 +77,9 @@ class FeatureContext extends BehatContext
             CURLOPT_RETURNTRANSFER => true,
         ));
 
-        if (isset($this->testPort))
+        if (isset($this->port))
         {
-            curl_setopt($ch, CURLOPT_PORT, $this->testPort);
+            curl_setopt($ch, CURLOPT_PORT, $this->port);
         }
 
         $result = curl_exec($ch);
@@ -134,7 +148,8 @@ class FeatureContext extends BehatContext
             next($parts);
         }
 
-        if(!$found){
+        if (!$found)
+        {
             throw new \Exception(sprintf('Expected header "%s" not found.', $expected));
         }
     }
