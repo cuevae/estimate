@@ -22,8 +22,7 @@ Feature: Project management
     And I send a GET request
     Then I should receive 200 response code
     And I should receive content type application/vnd.collection+json
-    #And header Location should contain http://estimate.dev/projects/
-    #And body should contain a link to http://estimate.dev/projects/
+    And body should contain a collection+json object
 
 #  Scenario: Updating a project
 #    Given I know the url for a specific project with name "name" and due date "date"

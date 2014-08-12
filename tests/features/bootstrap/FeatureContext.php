@@ -23,6 +23,8 @@ class FeatureContext extends BehatContext
     protected $port = null;
     protected $endpoint = null;
     protected $response = null;
+    protected $responseHeaders = null;
+    protected $responseBody = null;
     protected $info = null;
 
     /**
@@ -40,7 +42,7 @@ class FeatureContext extends BehatContext
             throw new \Exception('Please specify a test server in behat.yml file.');
         }
         $this->server = $parameters['test_server'];
-        $this->port = $parameters['test_port'];
+        $this->port   = $parameters['test_port'];
 
         //Update the endpoints with the given server name
         array_walk($this->endpoints, function (&$item, $key)
@@ -90,6 +92,9 @@ class FeatureContext extends BehatContext
 
         $this->response = $result;
         $this->info     = curl_getinfo($ch);
+        list($headers, $body) = explode("\r\n\r\n", $this->response, 2);
+        $this->responseHeaders = $headers;
+        $this->responseBody    = $body;
         curl_close($ch);
     }
 
@@ -132,16 +137,14 @@ class FeatureContext extends BehatContext
      */
     public function headerShouldContain($header, $content)
     {
-        if (!isset($this->info))
+        if (!isset($this->responseHeaders))
         {
-            throw new \Exception('There\'s no registered output. Please ensure the request was successful.');
+            throw new \Exception('There\'s no registered response headers. Please ensure the request was successful.');
         }
 
         $expected = $header . ': ' . $content;
-
-        list($headers) = explode("\r\n\r\n", $this->response);
-        $parts = explode("\n", $headers);
-        $found = false;
+        $parts    = explode("\n", $this->responseHeaders);
+        $found    = false;
         while (current($parts) && !$found)
         {
             $found = (current($parts) == $expected);
@@ -151,6 +154,43 @@ class FeatureContext extends BehatContext
         if (!$found)
         {
             throw new \Exception(sprintf('Expected header "%s" not found.', $expected));
+        }
+    }
+
+    /**
+     * Returns TRUE if an object complies with the collection+json structure
+     *
+     * @param $obj
+     *
+     * @return bool
+     */
+    protected function isCollectionObject($obj)
+    {
+        return ($obj instanceof \StdClass)
+               && property_exists($obj, 'collection')
+               && property_exists($obj->collection, 'version')
+               && property_exists($obj->collection, 'href')
+               && property_exists($obj->collection, 'links')
+               && property_exists($obj->collection, 'items')
+               && property_exists($obj->collection, 'queries')
+               && property_exists($obj->collection, 'template')
+               && property_exists($obj->collection, 'error');
+    }
+
+    /**
+     * @Given /^body should contain a collection\+json object$/
+     */
+    public function bodyShouldContainACollectionJsonObject()
+    {
+        if (!isset($this->responseBody))
+        {
+            throw new \Exception('There\'s no registered response body. Please ensure the request was successful.');
+        }
+
+        $jsonObj = json_decode($this->responseBody);
+        if (!$this->isCollectionObject($jsonObj))
+        {
+            throw new \Exception('The given object does not comply with the collection+json structure.');
         }
     }
 
