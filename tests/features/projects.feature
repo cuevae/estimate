@@ -2,19 +2,19 @@ Feature: Project management
 
   As a Developer I'd like to manage my projects (CRUD)
 
-#  Scenario Outline: Creating a project successfully
-#    Given I know the end point for projects
-#    And I send a PUT request with a project name <name> and due_date <date>
-#    Then I should receive 201 response code
-#    And I should receive content type application/vnd.collection+json
-#    And header Location should contain http://estimate.dev/projects/1
-#    And body should contain a link to http://estimate.dev/projects/1
-#
-#  Examples:
-#    | name | date              |
-#    | Test | 1/2/2014          |
-#    | Test | 1-2-2014          |
-#    | Test | 1st February 2014 |
+  Scenario Outline: Creating a project successfully
+    Given I know the end point for projects
+    And I send a PUT request with a project name <name> and due_date <date>
+    Then I should receive 201 response code
+    And I should receive content type text/html
+    And header Location should contain {SERVER}/projects/1
+    And body should contain a link to {SERVER}/projects/1
+
+  Examples:
+    | name | date              |
+    | Test | 1/2/2014          |
+    | Test | 1-2-2014          |
+    | Test | 1st February 2014 |
 
 
   Scenario: Getting the list of available projects

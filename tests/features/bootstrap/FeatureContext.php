@@ -68,42 +68,17 @@ class FeatureContext extends BehatContext
      */
     public function iSendAGetRequest()
     {
-        if (!isset($this->endpoint))
-        {
-            throw new \Exception('There\'s no current endpoint selected.');
-        }
-        $ch = curl_init($this->endpoint);
-        curl_setopt_array($ch, array(
-            CURLOPT_HEADER         => true,
-            CURLOPT_HTTPGET        => true,
-            CURLOPT_RETURNTRANSFER => true,
-        ));
-
-        if (isset($this->port))
-        {
-            curl_setopt($ch, CURLOPT_PORT, $this->port);
-        }
-
-        $result = curl_exec($ch);
-        if (false === $result)
-        {
-            throw new \Exception(sprintf('The request could not be performed. Error: %s', curl_error($ch)));
-        }
-
-        $this->response = $result;
-        $this->info     = curl_getinfo($ch);
-        list($headers, $body) = explode("\r\n\r\n", $this->response, 2);
-        $this->responseHeaders = $headers;
-        $this->responseBody    = $body;
-        curl_close($ch);
+        $request = $this->buildRequest('GET');
+        $this->sendRequest($request);
     }
 
     /**
-     * @Given /^I send a (GET|POST|PUT|DELETE|HEAD) request with a project name (.+) and due_date (.+)$/
+     * @Given /^I send a PUT request with a project name (.+) and due_date (.+)$/
      */
-    public function iSendARequestWithAProjectNameAndADueDate($request, $name, $date)
+    public function iSendAPutRequestWithAProjectNameAndADueDate($name, $dueDate)
     {
-        throw new PendingException();
+        $ch = $this->buildRequest('PUT', array('name' => $name, 'due_date' => $dueDate));
+        $this->sendRequest($ch);
     }
 
     /**
@@ -142,6 +117,15 @@ class FeatureContext extends BehatContext
             throw new \Exception('There\'s no registered response headers. Please ensure the request was successful.');
         }
 
+        if (strpos($content, '{SERVER}') !== false)
+        {
+            $server  = (isset($this->port)
+                ? ($this->server . ':' . $this->port)
+                : ($this->server)
+            );
+            $content = str_replace('{SERVER}', $server, $content);
+        }
+
         $expected = $header . ': ' . $content;
         $parts    = explode("\n", $this->responseHeaders);
         $found    = false;
@@ -153,6 +137,7 @@ class FeatureContext extends BehatContext
 
         if (!$found)
         {
+            var_dump($this->responseHeaders);
             throw new \Exception(sprintf('Expected header "%s" not found.', $expected));
         }
     }
@@ -197,20 +182,87 @@ class FeatureContext extends BehatContext
     /**
      * @Given /^body should contain a link to (.*)$/
      */
-    public function bodyShouldContainALinkToTheResource()
+    public function bodyShouldContainALinkTo($link)
     {
-        throw new PendingException();
+        if (!isset($this->responseBody))
+        {
+            throw new \Exception('There\'s no registered response body. Please ensure the request was successful.');
+        }
+
+        if (strpos($link, '{SERVER}') !== false)
+        {
+            $server = (isset($this->port)
+                ? ($this->server . ':' . $this->port)
+                : ($this->server)
+            );
+            $link   = str_replace('{SERVER}', $server, $link);
+        }
+
+        assertEquals($link, $this->responseBody);
     }
 
-    //
-    // Place your definition and hook methods here:
-    //
-    //    /**
-    //     * @Given /^I have done something with "([^"]*)"$/
-    //     */
-    //    public function iHaveDoneSomethingWith($argument)
-    //    {
-    //        doSomethingWith($argument);
-    //    }
-    //
+
+    /**
+     * Builds and HTTP request
+     *
+     * @param       $type
+     * @param array $params
+     *
+     * @return resource
+     * @throws Exception
+     */
+    protected function buildRequest($type, array $params = array())
+    {
+        if (!isset($this->endpoint))
+        {
+            throw new \Exception('There\'s no current endpoint selected.');
+        }
+        $ch = curl_init($this->endpoint);
+        curl_setopt_array($ch, array(
+            CURLOPT_HEADER         => true,
+            CURLOPT_CUSTOMREQUEST  => $type,
+            CURLOPT_RETURNTRANSFER => true,
+        ));
+
+        if (!empty($params))
+        {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+        }
+
+        if (isset($this->port))
+        {
+            curl_setopt($ch, CURLOPT_PORT, $this->port);
+        }
+
+        return $ch;
+    }
+
+    /**
+     * Sends the given request
+     *
+     * @param $ch
+     *
+     * @throws Exception
+     */
+    protected function sendRequest($ch)
+    {
+        if (gettype($ch) != 'resource')
+        {
+            throw new \Exception('Expected resource to be able to send request.');
+        }
+
+        $result = curl_exec($ch);
+        if (false === $result)
+        {
+            throw new \Exception(sprintf('The request could not be performed. Error: %s', curl_error($ch)));
+        }
+
+        $this->response = $result;
+        $this->info     = curl_getinfo($ch);
+        list($headers, $body) = explode("\r\n\r\n", $this->response, 2);
+        $this->responseHeaders = $headers;
+        $this->responseBody    = $body;
+        curl_close($ch);
+    }
+
 }

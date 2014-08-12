@@ -69,13 +69,14 @@ $app->put(
 
             try{
                 $estimate->addProject($name, $dueDate);
+                $app->response->header('Location', $app->request->getUrl() . $app->request->getResourceUri() . '/1');
                 $app->response->status(201);
             } catch( \Exception $e ){
                 $app->response->status(400);
                 echo($e->getMessage());
             }
 
-            echo json_encode($app->request->getBody());
+            echo $app->request->getUrl() . $app->request->getResourceUri() . '/1';
         }
 );
 
