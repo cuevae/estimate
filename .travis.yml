@@ -3,12 +3,13 @@ php:
   - 5.5
   - 5.4
 before_script:
+  - composer self-update
   - composer install --no-interaction
   - git submodule init
   - git submodule update
 script:
   - ./bin/behat --config behat.yml
-  - phpunit --coverage-clover=coverage.clover
+  - phpunit --coverage-clover=coverage.clover --verbose
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover coverage.clover
