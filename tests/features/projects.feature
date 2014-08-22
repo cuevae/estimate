@@ -24,6 +24,13 @@ Feature: Project management
     And I should receive content type application/vnd.collection+json
     And body should contain a collection+json object
 
+  Scenario: Navigating to a project
+    Given I know the end point for an_existing_project
+    And I send a GET request
+    Then I should receive 200 response code
+    And I should receive content type application/vnd.collection+json
+    And body should contain a collection+json object
+
 #  Scenario: Updating a project
 #    Given I know the url for a specific project with name "name" and due date "date"
 #    And I send a PUT request with a new name and a new due date

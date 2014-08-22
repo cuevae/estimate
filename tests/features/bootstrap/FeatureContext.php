@@ -16,7 +16,8 @@ class FeatureContext extends BehatContext
 {
 
     protected $endpoints = array(
-        'projects' => '{SERVER}/projects'
+        'projects' => '{SERVER}/',
+        'an_existing_project' => '{SERVER}/projects/1'
     );
 
     protected $server = null;

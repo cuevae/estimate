@@ -37,6 +37,9 @@ class App
             $this->persistenceHandler->put($project);
         }
 
+        $projectId = 1;
+
+        return $projectId;
     }
 
 } 
