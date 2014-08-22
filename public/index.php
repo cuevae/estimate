@@ -3,36 +3,51 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 use \CollectionPlusJson\Collection;
-use \CollectionPlusJson\Util\Href;
 use \CollectionPlusJson\Util\Parser\Item as ItemParser;
 use \Estimate\App as Estimate;
-use \Estimate\Persistence\Implementation\Json as JsonPersistence;
 
 const ENVIRONMENT      = 'development';
 const SLIM_CONFIG_PATH = '../config/slim/app-config.json';
 
-$configLoader = json_decode(file_get_contents(__DIR__ . '/' .SLIM_CONFIG_PATH), true);
-$appConfig    = $configLoader[ENVIRONMENT];
+class EndPoint
+{
+    const ROOT     = '/';
+    const PROJECTS = '/';
+    const PROJECT  = '/projects/:projectId';
+    const TASKS    = '/projects/:projectId/tasks';
+    const TASK     = '/projects/:projectId/tasks/:taskId';
 
+    /**
+     * @param $projectId
+     *
+     * @return string
+     */
+    public static function forProject($projectId)
+    {
+        return str_replace(':projectId', $projectId, static::PROJECT);
+    }
+}
+
+$configLoader = json_decode(file_get_contents(__DIR__ . '/' . SLIM_CONFIG_PATH), true);
+$appConfig    = $configLoader[ENVIRONMENT];
 /** @var \Slim\Slim $app */
 $app = new \Slim\Slim($appConfig);
 
 $app->get(
-    '/projects/',
+    EndPoint::PROJECTS,
         function () use ($app)
         {
 
-            $url = new Href($app->request()->getUrl());
-
-            $collection = new Collection($url);
-            $estimate   = new Estimate(new JsonPersistence(__DIR__ . '/../persistence-test-folder/json'));
+            $collection = new Collection($app->request()->getUrl());
+            $estimate   = new Estimate();
 
             $projects = $estimate->getProjects();
-            if (is_array($projects) && !empty($projects) )
+            if (is_array($projects) && !empty($projects))
             {
-                $projects = array_reduce($projects, function ($result, $item) use ($url)
+                $projects = array_reduce($projects, function ($result, $item)
                 {
-                    $temp     = array( 'href' => $url->extend('/project/' . $item['id'])->getUrl(),
+
+                    $temp     = array( 'href' => EndPoint::forProject($item['id']),
                                        'data' => array( array( 'id', $item['id'], 'Project id.' ),
                                                         array( 'name', $item['name'], 'Project name.' ),
                                                         array( 'due_date_ts', $item['due_date'], 'Project due date timestamp.' ),
@@ -59,32 +74,40 @@ $app->get(
 );
 
 $app->put(
-    '/projects/',
+    EndPoint::PROJECTS,
         function () use ($app)
         {
-            $name = $app->request->put('name');
+            $name    = $app->request->put('name');
             $dueDate = $app->request->put('due_date');
 
-            $estimate   = new Estimate(new JsonPersistence(__DIR__ . '/../persistence-test-folder/json'));
+            $estimate = new Estimate();
 
-            try{
-                $estimate->addProject($name, $dueDate);
-                $app->response->header('Location', $app->request->getUrl() . $app->request->getResourceUri() . '/1');
+            try
+            {
+                $projectId = $estimate->addProject($name, $dueDate);
+                $projectUrl = $app->request->getUrl() . EndPoint::forProject($projectId);
+                $app->response->header('Location', $projectUrl);
                 $app->response->status(201);
-            } catch( \Exception $e ){
+            } catch (\Exception $e)
+            {
                 $app->response->status(400);
                 echo($e->getMessage());
             }
 
-            echo $app->request->getUrl() . $app->request->getResourceUri() . '/1';
+            echo $projectUrl;
         }
 );
 
 $app->get(
-    '/project/:projectId',
+    EndPoint::PROJECT,
         function ($projectId) use ($app)
         {
-            echo "This is project " . $projectId . PHP_EOL;
+            $collection = new Collection($app->request()->getUrl());
+
+            $app->response->headers->set('Content-Type', 'application/vnd.collection+json');
+            $app->response->status(200);
+
+            echo json_encode($collection->output());
         }
 );
 
