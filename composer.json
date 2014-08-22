@@ -2,7 +2,8 @@
     "require": {
         "slim/slim": "*",
         "illuminate/database": "*",
-        "behat/behat": "2.4.*@stable"
+        "behat/behat": "2.4.*@stable",
+        "cuevae/collection-plus-json": "dev-master"
     },
 
     "require-dev": {
@@ -16,8 +17,7 @@
 
     "autoload": {
         "psr-4": {
-            "Estimate\\" : "src/",
-            "CollectionPlusJson\\" : "lib/collectionPlusJson/src/"
+            "Estimate\\" : "src/"
         }
     }
 }
